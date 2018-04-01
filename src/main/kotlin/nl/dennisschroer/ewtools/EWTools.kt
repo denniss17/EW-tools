@@ -13,9 +13,11 @@ import java.sql.Connection
 import javax.swing.text.rtf.RTFEditorKit
 
 class EWTools(val path: String, val command: String) {
+    /** Output directory of export command */
     val exportDir = "export"
+
+    /** Path to databases relative to database root */
     val dataPath: String = "v6.1/Databases/Data"
-    val dbDirectory: File = File(path)
 
     fun run() {
         validatePath()
@@ -45,6 +47,8 @@ class EWTools(val path: String, val command: String) {
     }
 
     private fun fileContentForSong(it: Song): String {
+        // file content is RTF, but we want plain text
+        // https://stackoverflow.com/a/5826234/3063682
         val rtfParser = RTFEditorKit()
         val document = rtfParser.createDefaultDocument()
         rtfParser.read(it.words.byteInputStream(), document, 0)
@@ -63,10 +67,12 @@ class EWTools(val path: String, val command: String) {
         return connection
     }
 
+    /** Validate if database exists in given path */
     private fun validatePath() {
-        if (!dbDirectory.exists()) throw IllegalArgumentException("$path does not exist")
-        if (!dbDirectory.isDirectory) throw IllegalArgumentException("$path is not a directory")
-        val dataDirectory = File("$dbDirectory/$dataPath")
+        val databaseDirectory = File(path)
+        if (!databaseDirectory.exists()) throw IllegalArgumentException("$databaseDirectory does not exist")
+        if (!databaseDirectory.isDirectory) throw IllegalArgumentException("$databaseDirectory is not a directory")
+        val dataDirectory = File("$path/$dataPath")
         if (!dataDirectory.exists()) throw IllegalArgumentException("$dataDirectory does not exist")
         if (!dataDirectory.isDirectory) throw IllegalArgumentException("$dataDirectory is not a directory")
     }
